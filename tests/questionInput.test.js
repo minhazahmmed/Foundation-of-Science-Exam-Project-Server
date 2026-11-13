@@ -1,0 +1,46 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { buildQuestionData } from '../src/utils/questionInput.js';
+
+test('accepts the JSON format from the image import (question + letter answer)', () => {
+  const q = buildQuestionData({
+    no: 75,
+    question: '$\\vec{A}$ ও $\\vec{B}$ দুটি ভেক্টর',
+    options: ['i ও ii', 'i ও iii', 'ii ও iii', 'i, ii ও iii'],
+    answer: 'গ',
+    board: 'ঢা. বো. ২০১৯',
+  });
+  assert.equal(q.correctIndex, 2);
+  assert.equal(q.options[0].text, 'i ও ii');
+  assert.equal(q.board, 'ঢা. বো. ২০১৯');
+});
+
+test('accepts native format with correctIndex and image options', () => {
+  const q = buildQuestionData({
+    text: 'গ্রাফ দেখে উত্তর দাও',
+    options: [{ image: 'a.png' }, { image: 'b.png' }, { text: 'গ' }, { text: 'ঘ' }],
+    correctIndex: 1,
+  });
+  assert.equal(q.correctIndex, 1);
+  assert.equal(q.options[1].image, 'b.png');
+});
+
+test('rejects identical options (the book misprint case)', () => {
+  assert.throws(
+    () =>
+      buildQuestionData({
+        question: 'প্রশ্ন',
+        options: ['a', 'b', 'c', 'b'],
+        answer: 'ক',
+      }),
+    /খ ও ঘ হুবহু এক/
+  );
+});
+
+test('rejects missing answer, wrong option count and empty question', () => {
+  const opts = ['a', 'b', 'c', 'd'];
+  assert.throws(() => buildQuestionData({ question: 'q', options: opts }), /সঠিক উত্তর/);
+  assert.throws(() => buildQuestionData({ question: 'q', options: opts, answer: 'ঙ' }), /সঠিক উত্তর/);
+  assert.throws(() => buildQuestionData({ question: 'q', options: ['a', 'b'], answer: 'ক' }), /৪টা অপশন/);
+  assert.throws(() => buildQuestionData({ options: opts, answer: 'ক' }), /প্রশ্নের লেখা/);
+});

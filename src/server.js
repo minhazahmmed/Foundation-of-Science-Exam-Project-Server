@@ -1,0 +1,12 @@
+import app from './app.js';
+import { connectDB } from './config/db.js';
+import { env } from './config/env.js';
+
+connectDB()
+  .then(() => {
+    app.listen(env.port, () => console.log(`Server running on port ${env.port}`));
+  })
+  .catch((err) => {
+    console.error('MongoDB-তে কানেক্ট হওয়া যায়নি:', err.message);
+    process.exit(1);
+  });
