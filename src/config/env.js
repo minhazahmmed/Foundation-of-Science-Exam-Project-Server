@@ -18,5 +18,5 @@ export const env = {
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
   teacherSecret: process.env.TEACHER_SECRET || '',
   geminiApiKey: process.env.GEMINI_API_KEY || '',
-  geminiModel: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+  geminiModel: process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
 };

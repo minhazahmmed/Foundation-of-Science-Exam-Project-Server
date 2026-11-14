@@ -4,6 +4,7 @@ export const toStudentQuestion = (q) => ({
   text: q.text,
   image: q.image,
   passage: q.passage,
+  passageImage: q.passageImage,
   board: q.board,
   options: q.options,
 });
@@ -14,6 +15,7 @@ export const toFullQuestion = (q) => ({
   text: q.text,
   image: q.image,
   passage: q.passage,
+  passageImage: q.passageImage,
   board: q.board,
   options: q.options,
   correctIndex: q.correctIndex,

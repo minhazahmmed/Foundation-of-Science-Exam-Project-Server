@@ -29,8 +29,8 @@ test('rejects unreadable, reversed, zero and too many numbers', () => {
 // ---------- ক্রম সাজানো ----------
 const raw = [
   { bookNo: 34, question: 'q34', options: ['a', 'b', 'c', 'd'], answer: 'ক', board: '', passage: '' },
-  { bookNo: '৩৫', question: 'q35', options: ['a', 'b', 'c', 'd'], answer: 'গ', answerGuessed: true },
-  { bookNo: 36, question: 'q36', options: ['a', 'b', 'c', 'd'], answer: null, answerGuessed: true },
+  { bookNo: '৩৫', question: 'q35', options: ['a', 'b', 'c', 'd'], answer: 'গ' },
+  { bookNo: 36, question: 'q36', options: ['a', 'b', 'c', 'd'], answer: null },
   { bookNo: 37, question: 'q37', options: ['a', 'b', 'c', 'd'], answer: 'ঙ' },
 ];
 
@@ -46,23 +46,30 @@ test('selected mode follows typed order, serial starts at 1, reports missing', (
   assert.deepEqual(missing, [99]);
 });
 
-test('cleans answers: bad letter becomes null, guessed flag only with an answer', () => {
+test('cleans answers: missing or bad letter becomes null', () => {
   const { questions } = arrangeExtracted(raw, null);
-  assert.equal(questions[1].answerGuessed, true);
+  assert.equal(questions[1].answer, 'গ');
   assert.equal(questions[2].answer, null);
-  assert.equal(questions[2].answerGuessed, false);
   assert.equal(questions[3].answer, null);
 });
 
 // ---------- প্রম্পট ----------
-test('prompt includes chosen numbers and the unmarked-answer rule', () => {
-  const selected = buildPrompt({ numbers: [34, 40], solveIfUnmarked: false });
+test('prompt includes chosen numbers and tells the model to ignore answer marks', () => {
+  const selected = buildPrompt({ numbers: [34, 40] });
   assert.match(selected, /34, 40/);
-  assert.match(selected, /"answer" এ null দাও/);
+  assert.match(selected, /উপেক্ষা করো/);
+  assert.doesNotMatch(selected, /answerGuessed/);
 
-  const all = buildPrompt({ numbers: null, solveIfUnmarked: true });
+  const all = buildPrompt({ numbers: null });
   assert.match(all, /সবগুলো বের করো/);
-  assert.match(all, /answerGuessed/);
+});
+
+test('wraps bare LaTeX in $...$ but leaves Bengali text alone', async () => {
+  const fake = { models: { generateContent: async () => ({ text: JSON.stringify([
+    { bookNo: 1, question: 'মান কত?', options: ['\\frac{1}{2}', 'ক খ', '$x^2$', '\\vec{A}\\cdot\\vec{B}'] },
+  ]) }) } };
+  const [item] = await extractQuestionsFromImages({ images: [image] }, fake);
+  assert.deepEqual(item.options, ['$\\frac{1}{2}$', 'ক খ', '$x^2$', '$\\vec{A}\\cdot\\vec{B}$']);
 });
 
 // ---------- নকল Gemini client দিয়ে সার্ভিস ----------
@@ -83,10 +90,10 @@ test('service sends images + prompt with JSON mode and returns parsed list', asy
   assert.equal(list.length, 1);
   assert.equal(sent.config.responseMimeType, 'application/json');
   assert.equal(sent.config.temperature, 0);
-  const parts = sent.contents[0].parts;
+  const parts = sent.contents; // ছবিগুলো এবং শেষে প্রম্পটের লেখা
   assert.equal(parts.filter((p) => p.inlineData).length, 2);
   assert.equal(parts[0].inlineData.data, Buffer.from('fake').toString('base64'));
-  assert.ok(parts.at(-1).text.includes('1'));
+  assert.ok(String(parts.at(-1)).includes('1'));
 });
 
 test('service turns Gemini failures into friendly errors', async () => {

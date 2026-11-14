@@ -24,22 +24,16 @@ const responseSchema = {
       passage: { type: Type.STRING },
       question: { type: Type.STRING },
       options: { type: Type.ARRAY, items: { type: Type.STRING } },
-      answer: { type: Type.STRING, nullable: true },
-      answerGuessed: { type: Type.BOOLEAN },
       needsImage: { type: Type.STRING },
     },
-    required: ['bookNo', 'question', 'options', 'answer'],
+    required: ['bookNo', 'question', 'options'],
   },
 };
 
-export function buildPrompt({ numbers, solveIfUnmarked }) {
+export function buildPrompt({ numbers }) {
   const scope = numbers?.length
     ? `শুধু বইয়ের এই নম্বরের প্রশ্নগুলো বের করো: ${numbers.join(', ')}। এই তালিকার বাইরের কোনো প্রশ্ন দেবে না। কোনো নম্বর ছবিতে না পেলে সেটা বাদ দাও, নিজে বানিয়ে লিখবে না।`
     : 'ছবিতে যতগুলো MCQ প্রশ্ন আছে সবগুলো বের করো, ছবিতে যে ক্রমে আছে সেই ক্রমে।';
-
-  const unmarked = solveIfUnmarked
-    ? 'কোনো প্রশ্নে দাগ না থাকলে নিজে হিসাব করে সঠিক উত্তর বের করো এবং ওই প্রশ্নে "answerGuessed" এ true দাও। দাগ দেখে পাওয়া উত্তরে false দাও।'
-    : 'কোনো প্রশ্নে দাগ না থাকলে বা দাগ পরিষ্কার না হলে "answer" এ null দাও। নিজে সমাধান করে উত্তর বসাবে না।';
 
   return `তুমি বাংলাদেশের এইচএসসি পাঠ্যবইয়ের MCQ পাতা থেকে প্রশ্ন টুকে লেখার সহকারী।
 ছবির প্রশ্ন নতুন করে বানানো বা বদলানো তোমার কাজ নয়। ছাপা প্রশ্নগুলো হুবহু তুলে লেখাই কাজ।
@@ -48,21 +42,42 @@ export function buildPrompt({ numbers, solveIfUnmarked }) {
 1. ${scope}
 2. "bookNo" এ বইয়ে প্রশ্নের পাশে ছাপা নম্বরটা ইংরেজি অঙ্কে দাও (যেমন ৭৪ হলে 74)।
 3. প্রশ্ন ও অপশনের লেখা হুবহু তোলো। অপশনের ক/খ/গ/ঘ অক্ষর বাদ দিয়ে শুধু অপশনের লেখা দাও, ক্রম ঠিক রাখো। অপশন সবসময় ঠিক ৪টা।
-4. সমীকরণ, ভেক্টর চিহ্ন, ভগ্নাংশ, মূল, গ্রিক অক্ষর সব LaTeX আকারে $...$ এর ভেতরে লেখো। যেমন $\\vec{A}\\times\\vec{B}$, $\\frac{x^2}{2}$, $\\theta=\\pi$। বাংলা লেখা $ এর বাইরে থাকবে।
+4. সমীকরণ, ভেক্টর চিহ্ন, ভগ্নাংশ, মূল, গ্রিক অক্ষর সব LaTeX আকারে $...$ এর ভেতরে লেখো। যেমন $\\vec{A}\\times\\vec{B}$, $\\frac{x^2}{2}$, $\\theta=\\pi$। বাংলা লেখা $ এর বাইরে থাকবে। অপশনের পুরো লেখাই সমীকরণ হলেও সেটা $...$ এর ভেতরে দিতে হবে, যেমন "$\\vec{A}\\cdot\\vec{B}$", "$\\frac{1}{2}|\\vec{A}\\times\\vec{B}|$"। $ ছাড়া কোনো LaTeX কমান্ড লিখবে না।
 5. (i), (ii), (iii) ধরনের বিবৃতিওয়ালা প্রশ্নে বিবৃতিগুলো "question" এর ভেতরেই লেখো, শেষের "নিচের কোনটি সঠিক?" অংশসহ।
 6. উদ্দীপক বা অনুচ্ছেদ থাকলে (যেমন "তথ্যটি থেকে ৭৬ ও ৭৭ নং প্রশ্নের উত্তর দাও") সেটা যে প্রশ্নগুলোর জন্য প্রযোজ্য তাদের প্রতিটার "passage" এ আলাদা করে লেখো। না থাকলে ফাঁকা স্ট্রিং।
 7. বোর্ডের নাম বা সাল ([ঢা. বো. ২০১৫] ইত্যাদি) থাকলে "board" এ দাও, না থাকলে ফাঁকা স্ট্রিং।
 8. প্রশ্ন বুঝতে কোনো চিত্র বা গ্রাফ লাগলে (যা লেখা দিয়ে প্রকাশ করা যায় না) "needsImage" এ এক লাইনে লেখো কী চিত্র। না লাগলে ফাঁকা স্ট্রিং।
-9. সঠিক উত্তর: প্রশ্নের অপশনে যেটা টিক, গোল দাগ বা কলমের দাগে চিহ্নিত সেটাই "answer" (ক, খ, গ বা ঘ)। পাতার পাশে হাতে লেখা নোট, লাল গোল দাগ বা প্রশ্ন নম্বরের চারপাশের দাগ উত্তরের চিহ্ন নয়, ওগুলো উপেক্ষা করো।
-10. ${unmarked}
-11. কোনো লেখা পড়া না গেলে অনুমান করে বসাবে না, ওই জায়গায় [অস্পষ্ট] লিখে দাও।
+9. সঠিক উত্তর বের করার দরকার নেই, লিখবেও না। অপশনের পাশে টিক, গোল দাগ, কলমের দাগ বা পাতার পাশে হাতে লেখা নোট থাকলে সেগুলো পুরোপুরি উপেক্ষা করো, শুধু ছাপা লেখাটুকু তোলো।
+10. কোনো লেখা পড়া না গেলে অনুমান করে বসাবে না, ওই জায়গায় [অস্পষ্ট] লিখে দাও।
 
 শুধু JSON array ফেরত দাও।`;
 }
 
+// অপশন/প্রশ্নে LaTeX আছে কিন্তু $ নেই, এমন লেখা $...$ এ মুড়ে দেয়।
+// বাংলা অক্ষর থাকলে ছোঁয় না, কারণ তখন কোন অংশ math সেটা অনুমান করা ঝুঁকির।
+const HAS_LATEX = /\\[a-zA-Z]+|[\^_]\{/;
+const HAS_BENGALI = /[\u0980-\u09FF]/;
+
+function wrapMath(value) {
+  if (typeof value !== 'string') return value;
+  const text = value.trim();
+  if (!text || text.includes('$')) return value;
+  if (!HAS_LATEX.test(text) || HAS_BENGALI.test(text)) return value;
+  return `$${text}$`;
+}
+
+function normalizeMath(item) {
+  return {
+    ...item,
+    passage: wrapMath(item.passage),
+    question: wrapMath(item.question),
+    options: Array.isArray(item.options) ? item.options.map(wrapMath) : item.options,
+  };
+}
+
 // images: [{ buffer, mimeType }]। কাঁচা প্রশ্নের তালিকা ফেরত দেয় (ক্রম সাজানো পরে হয়)।
 // testClient শুধু টেস্টে নকল client বসানোর জন্য।
-export async function extractQuestionsFromImages({ images, numbers = null, solveIfUnmarked = false }, testClient) {
+export async function extractQuestionsFromImages({ images, numbers = null }, testClient) {
   const ai = testClient ?? getClient();
 
   const imageParts = images.map((img) => ({
@@ -70,9 +85,10 @@ export async function extractQuestionsFromImages({ images, numbers = null, solve
   }));
 
   try {
+    // নতুন @google/genai SDK v3.3.0 এর ফরম্যাট অনুযায়ী contents এ অ্যারে আকারে সরাসরি পার্টস পাস করা হয়েছে
     const response = await ai.models.generateContent({
-      model: env.geminiModel,
-      contents: [{ role: 'user', parts: [...imageParts, { text: buildPrompt({ numbers, solveIfUnmarked }) }] }],
+      model: env.geminiModel || 'gemini-3.5-flash-lite',
+      contents: [...imageParts, buildPrompt({ numbers })],
       config: {
         responseMimeType: 'application/json',
         responseSchema,
@@ -82,7 +98,7 @@ export async function extractQuestionsFromImages({ images, numbers = null, solve
 
     const list = JSON.parse(response.text);
     if (!Array.isArray(list)) throw new SyntaxError('not an array');
-    return list;
+    return list.map(normalizeMath);
   } catch (err) {
     throw toApiError(err);
   }

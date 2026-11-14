@@ -8,7 +8,6 @@ import { parseQuestionNumbers } from '../utils/parseQuestionNumbers.js';
 //   images: ১-৫টা ছবি
 //   mode: "all" (ছবির সব প্রশ্ন) অথবা "selected" (শুধু বাছাই করা নম্বর)
 //   numbers: mode=selected হলে, যেমন "৩৪, ৩৫, ৪০-৪৫"
-//   solveIfUnmarked: "true" হলে দাগ না থাকা প্রশ্নের উত্তর AI নিজে বের করবে
 // সেভ হয় না। শুধু প্রশ্নের তালিকা ফেরত আসে, টিচার দেখে নিয়ে তারপর /api/questions/bulk এ সেভ করে।
 export const extractFromImages = asyncHandler(async (req, res) => {
   const files = req.files || [];
@@ -23,7 +22,6 @@ export const extractFromImages = asyncHandler(async (req, res) => {
   const raw = await extractQuestionsFromImages({
     images: files.map((f) => ({ buffer: f.buffer, mimeType: f.mimetype })),
     numbers,
-    solveIfUnmarked: req.body.solveIfUnmarked === 'true',
   });
 
   const { questions, missing } = arrangeExtracted(raw, numbers);

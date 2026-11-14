@@ -19,6 +19,7 @@ export function buildQuestionData(input = {}) {
     text,
     image,
     passage: String(input.passage ?? '').trim(),
+    passageImage: input.passageImage || '',
     options,
     correctIndex,
     explanation: String(input.explanation ?? '').trim(),

@@ -44,3 +44,15 @@ test('rejects missing answer, wrong option count and empty question', () => {
   assert.throws(() => buildQuestionData({ question: 'q', options: ['a', 'b'], answer: 'ক' }), /৪টা অপশন/);
   assert.throws(() => buildQuestionData({ options: opts, answer: 'ক' }), /প্রশ্নের লেখা/);
 });
+
+test('keeps the passage (uddipok) image', () => {
+  const q = buildQuestionData({
+    question: 'q',
+    passage: 'উদ্দীপক',
+    passageImage: 'https://example.com/fig.png',
+    options: ['a', 'b', 'c', 'd'],
+    answer: 'ক',
+  });
+  assert.equal(q.passageImage, 'https://example.com/fig.png');
+  assert.equal(buildQuestionData({ question: 'q', options: ['a', 'b', 'c', 'd'], answer: 'ক' }).passageImage, '');
+});

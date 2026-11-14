@@ -14,9 +14,7 @@ function cleanItem(raw = {}) {
     passage: text(raw.passage),
     question: text(raw.question ?? raw.text),
     options: Array.isArray(raw.options) ? raw.options.map(text) : [],
-    answer,
-    // দাগ না থাকায় AI নিজে সমাধান করে উত্তর বসালে true
-    answerGuessed: answer !== null && Boolean(raw.answerGuessed),
+    answer, // ছবি থেকে আসা প্রশ্নে সাধারণত null থাকে, টিচার নিজে ঠিক করে দেয়
     needsImage: text(raw.needsImage),
   };
 }
