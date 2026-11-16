@@ -23,6 +23,7 @@ export function buildQuestionData(input = {}) {
     options,
     correctIndex,
     explanation: String(input.explanation ?? '').trim(),
+    explanationImage: input.explanationImage || '',
     subject: String(input.subject ?? '').trim(),
     chapter: String(input.chapter ?? '').trim(),
     board: String(input.board ?? '').trim(),

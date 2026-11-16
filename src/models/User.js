@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema(
     },
     password: { type: String, required: true, select: false },
     role: { type: String, enum: ['student', 'teacher'], default: 'student' },
+    // শিক্ষক হওয়ার অনুরোধের অবস্থা: none (কোনো অনুরোধ নেই), pending (অপেক্ষায়), rejected (বাতিল)
+    teacherRequest: { type: String, enum: ['none', 'pending', 'rejected'], default: 'none' },
   },
   { timestamps: true }
 );

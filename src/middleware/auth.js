@@ -3,6 +3,7 @@ import { env } from '../config/env.js';
 import User from '../models/User.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
+import { isOwnerEmail } from '../utils/owner.js';
 
 // লগইন করা আছে কিনা দেখে। ঠিক থাকলে req.user এ ইউজার বসায়।
 export const protect = asyncHandler(async (req, res, next) => {
@@ -30,4 +31,10 @@ export const allowRoles = (...roles) => (req, res, next) => {
     return next(new ApiError(403, 'এই কাজের অনুমতি তোমার নেই'));
   }
   next();
+};
+
+// শুধু মূল শিক্ষক (OWNER_EMAIL) ঢুকতে পারবেন, শিক্ষক অনুমোদনের কাজে লাগে
+export const requireOwner = (req, res, next) => {
+  if (req.user.role === 'teacher' && isOwnerEmail(req.user.email)) return next();
+  next(new ApiError(403, 'এই কাজ শুধু মূল শিক্ষক করতে পারেন'));
 };

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMe, login, register } from '../controllers/auth.controller.js';
+import { getMe, login, register, requestTeacher } from '../controllers/auth.controller.js';
 import { protect } from '../middleware/auth.js';
 
 const router = Router();
@@ -7,5 +7,6 @@ const router = Router();
 router.post('/register', register);
 router.post('/login', login);
 router.get('/me', protect, getMe);
+router.post('/request-teacher', protect, requestTeacher);
 
 export default router;

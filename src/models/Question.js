@@ -17,7 +17,8 @@ const questionSchema = new mongoose.Schema(
     passageImage: { type: String, default: '' }, // উদ্দীপকের চিত্র
     options: { type: [optionSchema], required: true },
     correctIndex: { type: Number, required: true, min: 0, max: 3 }, // 0=ক, 1=খ, 2=গ, 3=ঘ
-    explanation: { type: String, trim: true, default: '' },
+    explanation: { type: String, trim: true, default: '' }, // ব্যাখ্যা বা সমাধান (লেখা)
+    explanationImage: { type: String, default: '' }, // সমাধানের ছবি
     subject: { type: String, trim: true, default: '' },
     chapter: { type: String, trim: true, default: '' },
     board: { type: String, trim: true, default: '' }, // যেমন "ঢা. বো. ২০১৫"

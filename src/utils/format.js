@@ -1,3 +1,5 @@
+import { isOwnerEmail } from './owner.js';
+
 // স্টুডেন্টকে প্রশ্ন পাঠানোর সময় সঠিক উত্তর আর ব্যাখ্যা বাদ দেওয়া হয়
 export const toStudentQuestion = (q) => ({
   _id: q._id,
@@ -20,6 +22,7 @@ export const toFullQuestion = (q) => ({
   options: q.options,
   correctIndex: q.correctIndex,
   explanation: q.explanation,
+  explanationImage: q.explanationImage,
   subject: q.subject,
   chapter: q.chapter,
 });
@@ -29,4 +32,6 @@ export const publicUser = (user) => ({
   name: user.name,
   email: user.email,
   role: user.role,
+  isOwner: user.role === 'teacher' && isOwnerEmail(user.email),
+  teacherRequest: user.teacherRequest || 'none',
 });

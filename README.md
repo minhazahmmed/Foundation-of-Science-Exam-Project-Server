@@ -3,18 +3,21 @@
 ## চালু করার নিয়ম
 ```bash
 npm install
-cp .env.example .env     # তারপর .env এ নিজের MONGO_URI, JWT_SECRET, TEACHER_SECRET বসাও
+cp .env.example .env     # তারপর .env এ নিজের MONGO_URI, JWT_SECRET, OWNER_EMAIL বসাও
 npm run dev              # http://localhost:5000
 npm test                 # গ্রেডিং ও ইনপুটের টেস্ট
 ```
 
 ## টিচার অ্যাকাউন্ট
-`POST /api/auth/register` এ `teacherCode` হিসেবে `.env` এর `TEACHER_SECRET` পাঠালে teacher হবে। না পাঠালে student।
+`POST /api/auth/register` এ সবাই student হয়। `wantsTeacher: true` পাঠালে শিক্ষক হওয়ার অনুরোধ জমা হয়, মূল শিক্ষক (`.env` এর `OWNER_EMAIL`) অনুমোদন দিলে তবে teacher হয়। `OWNER_EMAIL` এর ইমেইলে খুললে সরাসরি teacher।
 
 ## API
 | Method | Path | কে | কাজ |
 |---|---|---|---|
 | POST | /api/auth/register, /login | সবাই | অ্যাকাউন্ট খোলা, লগইন (token পাওয়া যায়) |
+| POST | /api/auth/request-teacher | student | শিক্ষক হওয়ার অনুরোধ পাঠানো |
+| GET | /api/teachers | মূল শিক্ষক | অপেক্ষায় থাকা অনুরোধ ও শিক্ষকদের তালিকা |
+| POST | /api/teachers/:id/approve, /reject, /remove | মূল শিক্ষক | অনুমোদন, বাতিল, শিক্ষক থেকে সরানো |
 | GET | /api/auth/me | লগইন করা | নিজের তথ্য |
 | GET/POST | /api/questions | teacher | প্রশ্ন ব্যাংক তালিকা, নতুন প্রশ্ন |
 | POST | /api/questions/bulk | teacher | JSON থেকে একসাথে অনেক প্রশ্ন |

@@ -56,3 +56,16 @@ test('keeps the passage (uddipok) image', () => {
   assert.equal(q.passageImage, 'https://example.com/fig.png');
   assert.equal(buildQuestionData({ question: 'q', options: ['a', 'b', 'c', 'd'], answer: 'ক' }).passageImage, '');
 });
+
+test('keeps the explanation text and its solution image', () => {
+  const q = buildQuestionData({
+    question: 'q',
+    options: ['a', 'b', 'c', 'd'],
+    answer: 'গ',
+    explanation: 'সমাধান',
+    explanationImage: 'https://example.com/solution.png',
+  });
+  assert.equal(q.explanation, 'সমাধান');
+  assert.equal(q.explanationImage, 'https://example.com/solution.png');
+  assert.equal(buildQuestionData({ question: 'q', options: ['a', 'b', 'c', 'd'], answer: 'ক' }).explanationImage, '');
+});
