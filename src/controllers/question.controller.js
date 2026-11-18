@@ -15,7 +15,10 @@ async function findOwnQuestion(id, teacherId) {
 
 // GET /api/questions?chapter=&subject=&search=&page=&limit=
 export const listQuestions = asyncHandler(async (req, res) => {
-  const { chapter, subject, search } = req.query;
+  // কুয়েরির মান অবজেক্ট হয়ে ফিল্টারে ঢুকতে পারে ({"$ne": ""} ধরনের), তাই সবসময় লেখায় বদলে নেওয়া হয়
+  const chapter = typeof req.query.chapter === 'string' ? req.query.chapter : '';
+  const subject = typeof req.query.subject === 'string' ? req.query.subject : '';
+  const search = typeof req.query.search === 'string' ? req.query.search : '';
   const page = Math.max(1, Number(req.query.page) || 1);
   const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
 

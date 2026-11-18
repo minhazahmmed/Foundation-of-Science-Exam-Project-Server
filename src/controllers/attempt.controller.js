@@ -88,8 +88,14 @@ export const submitExam = asyncHandler(async (req, res) => {
 
   const inTime = Date.now() <= attempt.expiresAt.getTime() + GRACE_MS;
   if (inTime && Array.isArray(req.body.answers)) {
+    // শুধু এই পরীক্ষার প্রশ্নের উত্তরই নেওয়া হয়, বাইরের আইডি দিয়ে উত্তরের তালিকা ফোলানো যায় না
+    const exam = await Exam.findById(attempt.exam).select('questions');
+    const allowed = new Set(exam.questions.map(String));
+    if (req.body.answers.length > allowed.size) throw new ApiError(400, 'উত্তরের সংখ্যা প্রশ্নের চেয়ে বেশি');
+
     for (const item of req.body.answers) {
-      await saveAnswer(attempt._id, item.questionId, readSelectedIndex(item.selectedIndex));
+      if (!allowed.has(String(item?.questionId))) throw new ApiError(400, 'এই প্রশ্ন এই পরীক্ষার নয়');
+      await saveAnswer(attempt._id, String(item.questionId), readSelectedIndex(item.selectedIndex));
     }
     attempt = await findOwnAttempt(req.params.id, req.user._id); // নতুন উত্তরসহ আবার আনা
   }

@@ -38,8 +38,8 @@ async function pickQuestionIds({ questionIds, random }, teacherId) {
   if (random?.count) {
     const size = readNumber(random.count, 'প্রশ্নের সংখ্যা', { min: 1, max: 200 });
     const filter = { createdBy: teacherId };
-    if (random.chapter) filter.chapter = random.chapter;
-    if (random.subject) filter.subject = random.subject;
+    if (typeof random.chapter === 'string' && random.chapter) filter.chapter = random.chapter;
+    if (typeof random.subject === 'string' && random.subject) filter.subject = random.subject;
 
     const picked = await Question.aggregate([{ $match: filter }, { $sample: { size } }]);
     if (picked.length < size) {
@@ -56,7 +56,7 @@ async function pickQuestionIds({ questionIds, random }, teacherId) {
 //         questionIds: [...]  অথবা  random: { count, chapter?, subject? } }
 export const createExam = asyncHandler(async (req, res) => {
   const { title } = req.body;
-  if (!title?.trim()) throw new ApiError(400, 'পরীক্ষার নাম দিতে হবে');
+  if (typeof title !== 'string' || !title.trim()) throw new ApiError(400, 'পরীক্ষার নাম দিতে হবে');
 
   const exam = await Exam.create({
     title,
@@ -111,7 +111,7 @@ export const updateExam = asyncHandler(async (req, res) => {
   const { title, durationMinutes, marksPerQuestion, negativeMark, isActive, questionIds } = req.body;
 
   if (title !== undefined) {
-    if (!title.trim()) throw new ApiError(400, 'পরীক্ষার নাম খালি রাখা যাবে না');
+    if (typeof title !== 'string' || !title.trim()) throw new ApiError(400, 'পরীক্ষার নাম খালি রাখা যাবে না');
     exam.title = title;
   }
   if (durationMinutes !== undefined) {

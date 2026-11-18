@@ -1,4 +1,4 @@
-import { LETTERS } from './questionInput.js';
+import { EN_LETTERS, LETTERS } from './questionInput.js';
 import { toEnglishDigits } from './parseQuestionNumbers.js';
 
 const text = (value) => String(value ?? '').trim();
@@ -6,7 +6,10 @@ const text = (value) => String(value ?? '').trim();
 // AI যা ফেরত দিয়েছে সেটা আমাদের প্রশ্নের আকারে গুছিয়ে নেয়
 function cleanItem(raw = {}) {
   const bookNo = Number.parseInt(toEnglishDigits(raw.bookNo), 10);
-  const answer = LETTERS.includes(text(raw.answer)) ? text(raw.answer) : null;
+  // A/B/C/D এলে ক/খ/গ/ঘ এ বদলে নেওয়া হয়, ভেতরে সবসময় ইনডেক্স দিয়েই চলে
+  const given = text(raw.answer);
+  const enIndex = EN_LETTERS.indexOf(given.toUpperCase());
+  const answer = LETTERS.includes(given) ? given : enIndex >= 0 ? LETTERS[enIndex] : null;
 
   return {
     bookNo: Number.isNaN(bookNo) ? null : bookNo,

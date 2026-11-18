@@ -69,3 +69,10 @@ test('keeps the explanation text and its solution image', () => {
   assert.equal(q.explanationImage, 'https://example.com/solution.png');
   assert.equal(buildQuestionData({ question: 'q', options: ['a', 'b', 'c', 'd'], answer: 'ক' }).explanationImage, '');
 });
+
+test('ইংরেজি প্রশ্নে A-D উত্তর আর optionStyle চলে', () => {
+  const data = buildQuestionData({ question: 'Pick one', options: ['a1', 'b1', 'c1', 'd1'], answer: 'c', optionStyle: 'en' });
+  assert.equal(data.correctIndex, 2);
+  assert.equal(data.optionStyle, 'en');
+  assert.equal(buildQuestionData({ question: 'x', options: ['1', '2', '3', '4'], correctIndex: 0 }).optionStyle, 'bn');
+});

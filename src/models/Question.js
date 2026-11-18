@@ -19,6 +19,7 @@ const questionSchema = new mongoose.Schema(
     correctIndex: { type: Number, required: true, min: 0, max: 3 }, // 0=ক, 1=খ, 2=গ, 3=ঘ
     explanation: { type: String, trim: true, default: '' }, // ব্যাখ্যা বা সমাধান (লেখা)
     explanationImage: { type: String, default: '' }, // সমাধানের ছবি
+    optionStyle: { type: String, enum: ['bn', 'en'], default: 'bn' }, // অপশনের চিহ্ন: bn = ক খ গ ঘ, en = A B C D
     subject: { type: String, trim: true, default: '' },
     chapter: { type: String, trim: true, default: '' },
     board: { type: String, trim: true, default: '' }, // যেমন "ঢা. বো. ২০১৫"

@@ -1,6 +1,7 @@
 import ApiError from './ApiError.js';
 
 export const LETTERS = ['ক', 'খ', 'গ', 'ঘ'];
+export const EN_LETTERS = ['A', 'B', 'C', 'D'];
 
 // ফর্ম থেকে আসা বা ছবি থেকে বানানো JSON, দুটোই এই একটা ফাংশন দিয়ে পরিষ্কার হয়।
 // মানে text/question দুই নামই চলবে, অপশন সাধারণ লেখা বা {text, image} দুটোই চলবে,
@@ -24,6 +25,7 @@ export function buildQuestionData(input = {}) {
     correctIndex,
     explanation: String(input.explanation ?? '').trim(),
     explanationImage: input.explanationImage || '',
+    optionStyle: input.optionStyle === 'en' ? 'en' : 'bn',
     subject: String(input.subject ?? '').trim(),
     chapter: String(input.chapter ?? '').trim(),
     board: String(input.board ?? '').trim(),
@@ -66,7 +68,9 @@ function readCorrectIndex(input) {
   if (Number.isInteger(input.correctIndex)) {
     index = input.correctIndex;
   } else if (typeof input.answer === 'string') {
-    index = LETTERS.indexOf(input.answer.trim());
+    const answer = input.answer.trim();
+    index = LETTERS.indexOf(answer);
+    if (index < 0) index = EN_LETTERS.indexOf(answer.toUpperCase());
   }
   if (index < 0 || index > 3) {
     throw new ApiError(400, 'সঠিক উত্তর ঠিক করা নেই');

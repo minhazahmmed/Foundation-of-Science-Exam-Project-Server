@@ -5,6 +5,7 @@ export function buildExamAnalysis(questions, attempts) {
     questionId: q._id,
     text: q.text,
     correctIndex: q.correctIndex,
+    optionStyle: q.optionStyle || 'bn',
     optionCounts: [0, 0, 0, 0],
     correct: 0,
     wrong: 0,

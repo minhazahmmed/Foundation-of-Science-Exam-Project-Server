@@ -1,9 +1,8 @@
-import jwt from 'jsonwebtoken';
-import { env } from '../config/env.js';
 import User from '../models/User.js';
 import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { isOwnerEmail } from '../utils/owner.js';
+import { verifyToken } from '../utils/token.js';
 
 // লগইন করা আছে কিনা দেখে। ঠিক থাকলে req.user এ ইউজার বসায়।
 export const protect = asyncHandler(async (req, res, next) => {
@@ -13,7 +12,7 @@ export const protect = asyncHandler(async (req, res, next) => {
 
   let payload;
   try {
-    payload = jwt.verify(token, env.jwtSecret);
+    payload = verifyToken(token);
   } catch {
     throw new ApiError(401, 'লগইনের মেয়াদ শেষ, আবার লগইন করো');
   }

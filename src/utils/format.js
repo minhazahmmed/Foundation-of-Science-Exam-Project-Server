@@ -9,6 +9,7 @@ export const toStudentQuestion = (q) => ({
   passageImage: q.passageImage,
   board: q.board,
   options: q.options,
+  optionStyle: q.optionStyle || 'bn',
 });
 
 // পরীক্ষা শেষের রেজাল্টে এবং টিচারের জন্য পুরো প্রশ্ন
@@ -20,6 +21,7 @@ export const toFullQuestion = (q) => ({
   passageImage: q.passageImage,
   board: q.board,
   options: q.options,
+  optionStyle: q.optionStyle || 'bn',
   correctIndex: q.correctIndex,
   explanation: q.explanation,
   explanationImage: q.explanationImage,
