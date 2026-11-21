@@ -25,8 +25,10 @@ export const toFullQuestion = (q) => ({
   correctIndex: q.correctIndex,
   explanation: q.explanation,
   explanationImage: q.explanationImage,
+  classLevel: q.classLevel || '',
   subject: q.subject,
   chapter: q.chapter,
+  serial: q.serial || 0,
 });
 
 export const publicUser = (user) => ({

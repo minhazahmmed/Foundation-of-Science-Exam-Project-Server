@@ -5,6 +5,7 @@ import {
   deleteQuestion,
   getQuestion,
   listChapters,
+  listFilters,
   listQuestions,
   updateQuestion,
 } from '../controllers/question.controller.js';
@@ -18,6 +19,7 @@ router.use(protect, allowRoles('teacher'));
 router.get('/', listQuestions);
 router.post('/', createQuestion);
 router.post('/bulk', createManyQuestions);
+router.get('/filters', listFilters); // /:id এর আগে রাখতে হবে
 router.get('/chapters', listChapters); // /:id এর আগে রাখতে হবে
 router.get('/:id', getQuestion);
 router.put('/:id', updateQuestion);

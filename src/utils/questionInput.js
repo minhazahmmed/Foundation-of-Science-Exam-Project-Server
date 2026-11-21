@@ -26,10 +26,21 @@ export function buildQuestionData(input = {}) {
     explanation: String(input.explanation ?? '').trim(),
     explanationImage: input.explanationImage || '',
     optionStyle: input.optionStyle === 'en' ? 'en' : 'bn',
+    classLevel: String(input.classLevel ?? '').trim(),
     subject: String(input.subject ?? '').trim(),
     chapter: String(input.chapter ?? '').trim(),
     board: String(input.board ?? '').trim(),
+    serial: readSerial(input.serial), // না দিলে undefined, তখন সার্ভার নিজে পরের নম্বর বসায়
   };
+}
+
+function readSerial(raw) {
+  if (raw === undefined || raw === null || raw === '') return undefined;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 0 || n > 100000) {
+    throw new ApiError(400, 'প্রশ্নের ক্রমিক নম্বর ০ বা তার বেশি পূর্ণ সংখ্যা হতে হবে');
+  }
+  return n;
 }
 
 function readOptions(raw) {

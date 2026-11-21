@@ -20,14 +20,16 @@ const questionSchema = new mongoose.Schema(
     explanation: { type: String, trim: true, default: '' }, // ব্যাখ্যা বা সমাধান (লেখা)
     explanationImage: { type: String, default: '' }, // সমাধানের ছবি
     optionStyle: { type: String, enum: ['bn', 'en'], default: 'bn' }, // অপশনের চিহ্ন: bn = ক খ গ ঘ, en = A B C D
+    classLevel: { type: String, trim: true, default: '' }, // শ্রেণি, যেমন "সপ্তম" বা "একাদশ"
     subject: { type: String, trim: true, default: '' },
     chapter: { type: String, trim: true, default: '' },
+    serial: { type: Number, default: 0, min: 0 }, // শ্রেণি + বিষয় + অধ্যায়ের ভেতরে প্রশ্নের ক্রমিক নম্বর (১, ২, ৩ ...)
     board: { type: String, trim: true, default: '' }, // যেমন "ঢা. বো. ২০১৫"
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }
 );
 
-questionSchema.index({ createdBy: 1, chapter: 1 });
+questionSchema.index({ createdBy: 1, classLevel: 1, subject: 1, chapter: 1, serial: 1 });
 
 export default mongoose.model('Question', questionSchema);
