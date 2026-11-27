@@ -9,6 +9,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import { randomCode } from '../utils/examCode.js';
 import { toFullQuestion } from '../utils/format.js';
 import { readNumber } from '../utils/validate.js';
+import Practice from '../models/Practice.js';
 
 const examLink = (code) => `${env.clientUrl}/exam/${code}`;
 
@@ -140,6 +141,7 @@ export const updateExam = asyncHandler(async (req, res) => {
 export const deleteExam = asyncHandler(async (req, res) => {
   const exam = await findOwnExam(req.params.id, req.user._id);
   await Attempt.deleteMany({ exam: exam._id });
+  await Practice.deleteMany({ exam: exam._id });
   await exam.deleteOne();
   res.json({ message: 'পরীক্ষা মোছা হয়েছে' });
 });

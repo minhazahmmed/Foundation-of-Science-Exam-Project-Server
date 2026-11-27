@@ -11,6 +11,7 @@ import examRoutes from './routes/exam.routes.js';
 import importRoutes from './routes/import.routes.js';
 import questionRoutes from './routes/question.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
+import practiceRoutes from './routes/practice.routes.js';
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use('/api/questions', questionRoutes);
 app.use('/api/import', importLimiter, importRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/attempts', attemptRoutes);
+app.use('/api/practice', practiceRoutes);
 app.use('/api/teachers', teacherRoutes);
 
 app.use(notFound);
