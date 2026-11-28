@@ -1,5 +1,7 @@
 import { env } from '../config/env.js';
 import Attempt from '../models/Attempt.js';
+import { isOwnerEmail } from '../utils/owner.js';
+import Practice from '../models/Practice.js';
 import Exam from '../models/Exam.js';
 import Question from '../models/Question.js';
 import { buildExamAnalysis } from '../services/analysis.service.js';
@@ -9,7 +11,6 @@ import asyncHandler from '../utils/asyncHandler.js';
 import { randomCode } from '../utils/examCode.js';
 import { toFullQuestion } from '../utils/format.js';
 import { readNumber } from '../utils/validate.js';
-import Practice from '../models/Practice.js';
 
 const examLink = (code) => `${env.clientUrl}/exam/${code}`;
 
@@ -105,11 +106,13 @@ export const getExam = asyncHandler(async (req, res) => {
   });
 });
 
+const MAX_DEMOS = 3;
+
 // PATCH /api/exams/:id
 // নম্বর বদলালে regrade চাপতে হবে। প্রশ্নের তালিকা শুধু তখনই বদলানো যায় যখন কেউ পরীক্ষা দেয়নি।
 export const updateExam = asyncHandler(async (req, res) => {
   const exam = await findOwnExam(req.params.id, req.user._id);
-  const { title, durationMinutes, marksPerQuestion, negativeMark, isActive, questionIds } = req.body;
+  const { title, durationMinutes, marksPerQuestion, negativeMark, isActive, isDemo, questionIds } = req.body;
 
   if (title !== undefined) {
     if (typeof title !== 'string' || !title.trim()) throw new ApiError(400, 'পরীক্ষার নাম খালি রাখা যাবে না');
@@ -125,6 +128,14 @@ export const updateExam = asyncHandler(async (req, res) => {
     exam.negativeMark = readNumber(negativeMark, 'নেগেটিভ নম্বর', { min: 0, max: 10 });
   }
   if (isActive !== undefined) exam.isActive = Boolean(isActive);
+  if (isDemo !== undefined) {
+    // ডেমো সব স্টুডেন্টের সামনে যায়, তাই শুধু মূল শিক্ষকই ঠিক করতে পারেন, আর সর্বোচ্চ ৩টা
+    if (!isOwnerEmail(req.user.email)) throw new ApiError(403, 'ডেমো পরীক্ষা শুধু মূল শিক্ষক ঠিক করতে পারেন');
+    if (isDemo && !exam.isDemo && (await Exam.countDocuments({ isDemo: true })) >= MAX_DEMOS) {
+      throw new ApiError(409, `ডেমো পরীক্ষা সর্বোচ্চ ${MAX_DEMOS}টা রাখা যায়, আগে একটা বাদ দাও`);
+    }
+    exam.isDemo = Boolean(isDemo);
+  }
 
   if (questionIds !== undefined) {
     if (await Attempt.exists({ exam: exam._id })) {

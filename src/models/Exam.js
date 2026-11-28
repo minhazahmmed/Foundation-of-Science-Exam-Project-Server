@@ -10,6 +10,8 @@ const examSchema = new mongoose.Schema(
     marksPerQuestion: { type: Number, default: 1 },
     negativeMark: { type: Number, default: 0 }, // ভুল উত্তরে কাটা নম্বর
     isActive: { type: Boolean, default: true },
+    // মূল শিক্ষক ডেমো করে দিলে সব স্টুডেন্ট এটা অনুশীলনের মতো দিয়ে দেখতে পারে (ফল কোথাও জমা হয় না)
+    isDemo: { type: Boolean, default: false },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }

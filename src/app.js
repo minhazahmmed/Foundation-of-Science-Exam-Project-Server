@@ -9,9 +9,10 @@ import attemptRoutes from './routes/attempt.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import examRoutes from './routes/exam.routes.js';
 import importRoutes from './routes/import.routes.js';
+import demoRoutes from './routes/demo.routes.js';
+import practiceRoutes from './routes/practice.routes.js';
 import questionRoutes from './routes/question.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
-import practiceRoutes from './routes/practice.routes.js';
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/api/import', importLimiter, importRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/attempts', attemptRoutes);
 app.use('/api/practice', practiceRoutes);
+app.use('/api/demo', demoRoutes);
 app.use('/api/teachers', teacherRoutes);
 
 app.use(notFound);
